@@ -20,7 +20,7 @@
         "symfony/framework-bundle": "~2.3|~3.0",
         "gos/pubsub-router-bundle": "~0.2",
         "gos/websocket-client": "~0.1.0",
-        "gos/ratchet-stack": "dev-dev",
+        "gos/ratchet-stack": "dev-ratchetv2",
         "gos/pnctl-event-loop-emitter" : "~0.1",
         "cboden/ratchet": "0.4"
     },
