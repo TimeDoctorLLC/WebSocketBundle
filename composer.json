@@ -21,8 +21,8 @@
         "gos/pubsub-router-bundle": "~0.2",
         "gos/websocket-client": "~0.1.0",
         "gos/pnctl-event-loop-emitter" : "~0.1",
-        "td/ratchet-stack": "~0.1.4",
-        "td/ratchet": "~0.4.3"
+        "td/ratchet-stack": "^0.1.4",
+        "td/ratchet": "^0.4.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8"
