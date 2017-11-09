@@ -69,12 +69,12 @@ class WampApplication implements WampServerInterface
         WampRouter $wampRouter,
         LoggerInterface $logger = null
     ) {
-        $this->rpcDispatcher = $rpcDispatcher;
+        $this->rpcDispatcher   = $rpcDispatcher;
         $this->topicDispatcher = $topicDispatcher;
         $this->eventDispatcher = $eventDispatcher;
-        $this->clientStorage = $clientStorage;
-        $this->wampRouter = $wampRouter;
-        $this->logger = null === $logger ? new NullLogger() : $logger;
+        $this->clientStorage   = $clientStorage;
+        $this->wampRouter      = $wampRouter;
+        $this->logger          = null === $logger ? new NullLogger() : $logger;
     }
 
     /**
@@ -86,14 +86,16 @@ class WampApplication implements WampServerInterface
      */
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
     {
-        $user = $this->clientStorage->getClient($conn->WAMP->clientStorageId);
+        $user     = $this->clientStorage->getClient($conn->WAMP->clientStorageId);
         $username = $user instanceof UserInterface ? $user->getUsername() : $user;
 
-        $this->logger->debug(sprintf(
-            '%s publish to %s',
-            $username,
-            $topic->getId()
-        ));
+        $this->logger->debug(
+            sprintf(
+                '%s publish to %s',
+                $username,
+                $topic->getId()
+            )
+        );
 
         $request = $this->wampRouter->match($topic);
 
@@ -107,10 +109,12 @@ class WampApplication implements WampServerInterface
      */
     public function onPush(WampRequest $request, $data, $provider)
     {
-        $this->logger->info(sprintf('Pusher %s has pushed', $provider), [
+        $this->logger->info(
+            sprintf('Pusher %s has pushed', $provider), [
             'provider' => $provider,
-            'topic' => $request->getMatched(),
-        ]);
+            'topic'    => $request->getMatched(),
+        ]
+        );
 
         $this->topicDispatcher->onPush($request, $data, $provider);
     }
@@ -130,17 +134,20 @@ class WampApplication implements WampServerInterface
     /**
      * @param ConnectionInterface        $conn
      * @param \Ratchet\Wamp\Topic|string $topic
+     * @param string                     $request
      */
-    public function onSubscribe(ConnectionInterface $conn, $topic)
+    public function onSubscribe(ConnectionInterface $conn, $topic, $request)
     {
-        $user = $this->clientStorage->getClient($conn->WAMP->clientStorageId);
+        $user     = $this->clientStorage->getClient($conn->WAMP->clientStorageId);
         $username = $user instanceof UserInterface ? $user->getUsername() : $user;
 
-        $this->logger->info(sprintf(
-            '%s subscribe to %s',
-            $username,
-            $topic->getId()
-        ));
+        $this->logger->info(
+            sprintf(
+                '%s subscribe to %s',
+                $username,
+                $topic->getId()
+            )
+        );
 
         $wampRequest = $this->wampRouter->match($topic);
 
@@ -153,14 +160,16 @@ class WampApplication implements WampServerInterface
      */
     public function onUnSubscribe(ConnectionInterface $conn, $topic)
     {
-        $user = $this->clientStorage->getClient($conn->WAMP->clientStorageId);
+        $user     = $this->clientStorage->getClient($conn->WAMP->clientStorageId);
         $username = $user instanceof UserInterface ? $user->getUsername() : $user;
 
-        $this->logger->info(sprintf(
-            'User %s unsubscribed to %s',
-            $username,
-            $topic->getId()
-        ));
+        $this->logger->info(
+            sprintf(
+                'User %s unsubscribed to %s',
+                $username,
+                $topic->getId()
+            )
+        );
 
         $wampRequest = $this->wampRouter->match($topic);
 
