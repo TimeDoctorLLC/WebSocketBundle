@@ -20,9 +20,9 @@
         "symfony/framework-bundle": "~2.3|~3.0",
         "gos/pubsub-router-bundle": "~0.2",
         "gos/websocket-client": "~0.1.0",
-        "oshanrube/ratchet-stack": "0.1.2",
+        "gos/ratchet-stack": "~0.1",
         "gos/pnctl-event-loop-emitter" : "~0.1",
-        "cboden/ratchet": "0.4"
+        "oshanrube/ratchet": "0.4.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8"
@@ -46,7 +46,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/oshanrube/RatchetStack"
+            "url": "https://github.com/oshanrube/Ratchet"
         }
     ]
 }
