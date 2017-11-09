@@ -1,5 +1,5 @@
 {
-    "name": "oshanrube/web-socket-bundle",
+    "name": "td/web-socket-bundle",
     "type": "symfony-bundle",
     "description": "Symfony Web Socket Bundle",
     "keywords": ["Web Socket Bundle", "Websocket", "WAMP", "IO", "Ratchet"],
@@ -20,9 +20,9 @@
         "symfony/framework-bundle": "~2.3|~3.0",
         "gos/pubsub-router-bundle": "~0.2",
         "gos/websocket-client": "~0.1.0",
-        "oshanrube/ratchet-stack": "~0.1.3",
         "gos/pnctl-event-loop-emitter" : "~0.1",
-        "oshanrube/ratchet": "~0.4.1"
+        "td/ratchet-stack": "~0.1.4",
+        "td/ratchet": "~0.4.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8"
@@ -46,11 +46,11 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/oshanrube/Ratchet"
+            "url": "https://github.com/TimeDoctorLLC/Ratchet"
         },
         {
             "type": "vcs",
-            "url": "https://github.com/oshanrube/RatchetStack"
+            "url": "https://github.com/TimeDoctorLLC/RatchetStack"
         }
     ]
 }
