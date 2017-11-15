@@ -2,15 +2,17 @@
 
 namespace Gos\Bundle\WebSocketBundle\Client\Auth;
 
+use Doctrine\ORM\EntityManager;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\HttpKernel\Log\NullLogger;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class WebsocketAuthenticationProvider implements WebsocketAuthenticationProviderInterface
@@ -36,25 +38,69 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
     protected $clientStorage;
 
     /**
+     * @var string
+     */
+    private $encryptionMethod;
+
+    /**
+     * @var string
+     */
+    private $secretHash;
+
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    /**
      * @param SecurityContextInterface|TokenStorageInterface $tokenStorage
-     * @param array                    $firewalls
-     * @param ClientStorageInterface   $clientStorage
-     * @param LoggerInterface          $logger
+     * @param array                                          $firewalls
+     * @param ClientStorageInterface                         $clientStorage
+     * @param LoggerInterface                                $logger
      */
     public function __construct(
         $tokenStorage,
         $firewalls = array(),
         ClientStorageInterface $clientStorage,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        $encryptionMethod,
+        $secretHash,
+        EntityManager $em
     ) {
         if (!$tokenStorage instanceof TokenStorageInterface && !$tokenStorage instanceof SecurityContextInterface) {
             throw new \InvalidArgumentException('Argument 1 should be an instance of Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface or Symfony\Component\Security\Core\SecurityContextInterface');
         }
 
-        $this->tokenStorage = $tokenStorage;
-        $this->firewalls = $firewalls;
-        $this->clientStorage = $clientStorage;
-        $this->logger = null === $logger ? new NullLogger() : $logger;
+        $this->tokenStorage     = $tokenStorage;
+        $this->firewalls        = $firewalls;
+        $this->clientStorage    = $clientStorage;
+        $this->logger           = null === $logger ? new NullLogger() : $logger;
+        $this->encryptionMethod = $encryptionMethod;
+        $this->secretHash       = $secretHash;
+        $this->em               = $em;
+    }
+
+    /**
+     * @param $connection
+     * @param $decoded_cookie
+     */
+    private function decryptCookie($connection, $decoded_cookie)
+    {
+        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+        $iv      = substr($decoded_cookie, 0, $iv_size);
+
+        if (false !== ($decryptedString = openssl_decrypt(substr($decoded_cookie, $iv_size), $this->encryptionMethod, $this->secretHash, 0, $iv))) {
+            $data   = unserialize($decryptedString);
+            $userId = $data['data']['UserID'];
+            if (null !== ($user = $this->em->getRepository('CoreBundle:Users')->find($userId))) {
+                //
+                foreach ($this->firewalls as $firewall) {
+                    $token = new UsernamePasswordToken($user, null, $firewall, array('ROLE_ADMIN'));
+                    $connection->Session->set('_security_'.$firewall, serialize($token));
+                }
+                $connection->Session->save();
+            }
+        }
     }
 
     /**
@@ -65,10 +111,13 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
     protected function getToken(ConnectionInterface $connection)
     {
         $token = null;
+        if (null !== ($cookie = $connection->WebSocket->request->getQuery()->get('c', null))) {
+            $this->decryptCookie($connection, $cookie);
+        }
 
         if (isset($connection->Session) && $connection->Session) {
             foreach ($this->firewalls as $firewall) {
-                if (false !== $serializedToken = $connection->Session->get('_security_' . $firewall, false)) {
+                if (false !== $serializedToken = $connection->Session->get('_security_'.$firewall, false)) {
                     /** @var TokenInterface $token */
                     $token = unserialize($serializedToken);
                     break;
@@ -77,7 +126,7 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
         }
 
         if (null === $token) {
-            $token = new AnonymousToken($this->firewalls[0], 'anon-' . $connection->WAMP->sessionId);
+            $token = new AnonymousToken($this->firewalls[0], 'anon-'.$connection->WAMP->sessionId);
         }
 
         if ($this->tokenStorage->getToken() !== $token) {
@@ -109,8 +158,8 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
             'session_id' => $conn->WAMP->sessionId,
         );
 
-        $token = $this->getToken($conn);
-        $user = $token->getUser();
+        $token    = $this->getToken($conn);
+        $user     = $token->getUser();
         $username = $user instanceof UserInterface ? $user->getUsername() : $user;
 
         try {
@@ -129,8 +178,8 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
         $conn->WAMP->clientStorageId = $identifier;
 
         $this->logger->info(sprintf(
-            '%s connected',
-            $username
+                '%s connected',
+                $username
         ), $loggerContext);
 
         return $token;
