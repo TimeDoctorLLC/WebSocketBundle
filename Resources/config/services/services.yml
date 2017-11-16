@@ -174,8 +174,8 @@ services:
             - '%gos_web_socket.firewall%'
             - '@gos_web_socket.client_storage'
             - '@?monolog.logger.websocket'
-            - '%encryptionMethod%'
-            - '%secretHash%'
+            - '%ENCRYPTION_METHOD%'
+            - '%SECRET_HASH%'
             - "@doctrine.orm.entity_manager"
 
     gos_web_socket.websocket.client_manipulator:
