@@ -62,16 +62,17 @@ class TopicDispatcher implements TopicDispatcherInterface
         TopicManager $topicManager,
         LoggerInterface $logger = null
     ) {
-        $this->topicRegistry = $topicRegistry;
-        $this->router = $router;
+        $this->topicRegistry      = $topicRegistry;
+        $this->router             = $router;
         $this->topicPeriodicTimer = $topicPeriodicTimer;
-        $this->topicManager = $topicManager;
-        $this->logger = null === $logger ? new NullLogger() : $logger;
+        $this->topicManager       = $topicManager;
+        $this->logger             = null === $logger ? new NullLogger() : $logger;
     }
 
     /**
      * @param ConnectionInterface $conn
      * @param Topic               $topic
+     * @param                     WampRequest @request
      */
     public function onSubscribe(ConnectionInterface $conn, Topic $topic, WampRequest $request)
     {
@@ -132,7 +133,7 @@ class TopicDispatcher implements TopicDispatcherInterface
         $dispatched = false;
 
         if ($topic) {
-            foreach ((array) $request->getRoute()->getCallback() as $callback) {
+            foreach ((array)$request->getRoute()->getCallback() as $callback) {
                 $appTopic = $this->topicRegistry->getTopic($callback);
 
                 if ($appTopic instanceof TopicPeriodicTimerInterface) {
@@ -164,17 +165,21 @@ class TopicDispatcher implements TopicDispatcherInterface
 
                         $dispatched = true;
                     } catch (\Exception $e) {
-                        $this->logger->error($e->getMessage(), [
-                            'code' => $e->getCode(),
-                            'file' => $e->getFile(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
+                        $this->logger->error(
+                            $e->getMessage(), [
+                                'code'  => $e->getCode(),
+                                'file'  => $e->getFile(),
+                                'trace' => $e->getTraceAsString(),
+                            ]
+                        );
 
-                        $conn->callError($topic->getId(), $topic, $e->getMessage(), [
-                            'topic' => $topic,
-                            'request' => $request,
-                            'event' => $calledMethod,
-                        ]);
+                        $conn->callError(
+                            $topic->getId(), $topic, $e->getMessage(), [
+                                'topic'   => $topic,
+                                'request' => $request,
+                                'event'   => $calledMethod,
+                            ]
+                        );
 
                         $dispatched = false;
                     }

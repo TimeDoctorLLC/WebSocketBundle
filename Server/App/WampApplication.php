@@ -111,9 +111,9 @@ class WampApplication implements WampServerInterface
     {
         $this->logger->info(
             sprintf('Pusher %s has pushed', $provider), [
-            'provider' => $provider,
-            'topic'    => $request->getMatched(),
-        ]
+                'provider' => $provider,
+                'topic'    => $request->getMatched(),
+            ]
         );
 
         $this->topicDispatcher->onPush($request, $data, $provider);
@@ -135,8 +135,9 @@ class WampApplication implements WampServerInterface
      * @param ConnectionInterface        $conn
      * @param \Ratchet\Wamp\Topic|string $topic
      * @param string                     $request
+     * @param array                      $options
      */
-    public function onSubscribe(ConnectionInterface $conn, $topic, $request)
+    public function onSubscribe(ConnectionInterface $conn, $topic, $request, $options)
     {
         $user     = $this->clientStorage->getClient($conn->WAMP->clientStorageId);
         $username = $user instanceof UserInterface ? $user->getUsername() : $user;
@@ -150,6 +151,7 @@ class WampApplication implements WampServerInterface
         );
 
         $wampRequest = $this->wampRouter->match($topic);
+        $topic->setOptions($options);
 
         $this->topicDispatcher->onSubscribe($conn, $topic, $wampRequest);
     }
