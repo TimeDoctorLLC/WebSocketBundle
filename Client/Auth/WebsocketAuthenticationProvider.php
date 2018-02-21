@@ -86,8 +86,9 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
      */
     private function decryptCookie($connection, $decoded_cookie)
     {
-        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-        $iv      = substr($decoded_cookie, 0, $iv_size);
+        $decoded_cookie = base64_decode($decoded_cookie);
+        $iv_size        = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+        $iv             = substr($decoded_cookie, 0, $iv_size);
 
         if (false !== ($decryptedString = openssl_decrypt(substr($decoded_cookie, $iv_size), $this->encryptionMethod, $this->secretHash, 0, $iv))) {
             $data   = unserialize($decryptedString);
