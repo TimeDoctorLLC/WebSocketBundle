@@ -86,7 +86,7 @@ class WampApplication implements WampServerInterface
      */
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
     {
-        $user     = $this->clientStorage->getClient($conn->WAMP->clientStorageId);
+        $user     = $this->clientStorage->getClient(isset($conn->WAMP->clientStorageId) ? $conn->WAMP->clientStorageId : false);
         $username = $user instanceof UserInterface ? $user->getUsername() : $user;
 
         $this->logger->debug(
