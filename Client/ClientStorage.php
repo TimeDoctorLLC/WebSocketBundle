@@ -83,9 +83,7 @@ class ClientStorage implements ClientStorageInterface
     {
         $serializedUser = serialize($user);
 
-        $context = [
-            'user' => $serializedUser,
-        ];
+        $context = [];
 
         if ($user instanceof UserInterface) {
             $context['username'] = $user->getUsername();
