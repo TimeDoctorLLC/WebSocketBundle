@@ -17,8 +17,7 @@
     ],
     "require": {
         "php": ">=5.4",
-        "td/ratchet-stack": "v0.1.6",
-        "td/ratchet": "v0.4.6",
+        "cboden/ratchet": "^0.4.1",
         "symfony/framework-bundle": "^2.3|^3.0|^4.0",
         "gos/pubsub-router-bundle": "^0.3",
         "gos/websocket-client": "^0.1",
@@ -42,15 +41,5 @@
         "branch-alias": {
             "dev-master": "1.8.x-dev"
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/TimeDoctorLLC/Ratchet"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/TimeDoctorLLC/RatchetStack"
-        }
-    ]
+    }
 }
