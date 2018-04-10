@@ -22,7 +22,6 @@
         "gos/websocket-client": "^0.1",
         "gos/pnctl-event-loop-emitter" : "^0.1",
         "ocramius/proxy-manager": "^1.0|^2.1",
-        "td/ratchet-stack": "v0.1.6",
         "td/ratchet": "v0.4.7"
     },
     "require-dev": {
@@ -47,10 +46,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/TimeDoctorLLC/Ratchet"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/TimeDoctorLLC/RatchetStack"
         }
     ]
 }
