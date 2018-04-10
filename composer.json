@@ -23,7 +23,7 @@
         "gos/pubsub-router-bundle": "^0.3",
         "gos/websocket-client": "^0.1",
         "gos/pnctl-event-loop-emitter" : "^0.1",
-        "ocramius/proxy-manager": "^1.0|^2.1",
+        "ocramius/proxy-manager": "^1.0|^2.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8"
