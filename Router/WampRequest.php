@@ -26,6 +26,11 @@ class WampRequest
     protected $matched;
 
     /**
+     * @var string
+     */
+    protected $requestId;
+
+    /**
      * @param string         $routeName
      * @param RouteInterface $route
      * @param ParameterBag   $attributes
@@ -69,5 +74,21 @@ class WampRequest
     public function getMatched()
     {
         return $this->matched;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRequestId()
+    {
+        return $this->requestId;
+    }
+
+    /**
+     * @param mixed $requestId
+     */
+    public function setRequestId($requestId)
+    {
+        $this->requestId = $requestId;
     }
 }

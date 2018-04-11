@@ -151,6 +151,7 @@ class WampApplication implements WampServerInterface
         );
 
         $wampRequest = $this->wampRouter->match($topic);
+        $wampRequest->setRequestId($request);
         $topic->setOptions($options);
 
         $this->topicDispatcher->onSubscribe($conn, $topic, $wampRequest);
