@@ -112,7 +112,9 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
     protected function getToken(ConnectionInterface $connection)
     {
         $token = null;
-        if (null !== ($cookie = $connection->WebSocket->request->getQuery()->get('c', null))) {
+        $query = $connection->getConnection()->getConnection()->getHttpRequest()->getUri()->getQuery();
+        parse_str($query, $query_values);
+        if (isset($query_values['c']) && null !== ($cookie = $query_values['c'])) {
             $this->decryptCookie($connection, $cookie);
         }
 
@@ -148,15 +150,17 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
     public function authenticate(ConnectionInterface $conn)
     {
         if (1 === count($this->firewalls) && 'ws_firewall' === $this->firewalls[0]) {
-            $this->logger->warning(sprintf(
+            $this->logger->warning(
+                sprintf(
                     'User firewall is not configured, we have set %s by default',
-                    $this->firewalls[0])
+                    $this->firewalls[0]
+                )
             );
         }
 
         $loggerContext = array(
             'connection_id' => $conn->resourceId,
-            'session_id' => $conn->WAMP->sessionId,
+            'session_id'    => $conn->WAMP->sessionId,
         );
 
         $token    = $this->getToken($conn);
@@ -178,10 +182,12 @@ class WebsocketAuthenticationProvider implements WebsocketAuthenticationProvider
         $this->clientStorage->addClient($identifier, $token->getUser());
         $conn->WAMP->clientStorageId = $identifier;
 
-        $this->logger->info(sprintf(
+        $this->logger->info(
+            sprintf(
                 '%s connected',
                 $username
-        ), $loggerContext);
+            ), $loggerContext
+        );
 
         return $token;
     }
