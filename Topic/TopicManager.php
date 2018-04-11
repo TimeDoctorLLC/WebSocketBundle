@@ -132,6 +132,14 @@ class TopicManager implements WsServerInterface, WampServerInterface
         return $this->topicLookup[$topic];
     }
 
+    /**
+     * @return Topic[]
+     */
+    public function getTopics()
+    {
+        return $this->topicLookup;
+    }
+
     protected function cleanTopic(Topic $topic, ConnectionInterface $conn)
     {
         if ($conn->WAMP->subscriptions->contains($topic)) {
