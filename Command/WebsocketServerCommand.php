@@ -58,6 +58,7 @@ class WebsocketServerCommand extends Command
         $this
             ->setName('gos:websocket:server')
             ->setDescription('Starts the web socket servers')
+            ->addArgument('server_alias', InputArgument::REQUIRED, 'Server alias name')
             ->addArgument('name', InputArgument::OPTIONAL, 'Server name')
             ->addOption('profile', 'm', InputOption::VALUE_NONE, 'Profiling server')
             ->addOption('host', 'a', InputOption::VALUE_OPTIONAL, 'Host')
@@ -70,6 +71,8 @@ class WebsocketServerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $GLOBALS['ServerName'] = $input->getArgument('server_alias');
+
         $this->entryPoint->launch(
             $input->getArgument('name'),
             $input->getOption('host') === null ? $this->host : $input->getOption('host'),

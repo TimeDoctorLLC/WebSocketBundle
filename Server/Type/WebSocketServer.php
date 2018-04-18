@@ -126,9 +126,7 @@ class WebSocketServer implements ServerInterface
      */
     public function launch($host, $port, $profile)
     {
-        $this->logger->info('Starting web socket');
-
-
+        $this->logger->info('Starting web socket server: '.$GLOBALS['ServerName']);
         $server = new Server("$host:$port", $this->loop);
 
         if (true === $profile) {
